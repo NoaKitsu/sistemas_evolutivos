@@ -231,8 +231,9 @@ vector<ResultadoBatalha> batalharGeracao(vector<Personagem> populacao, Inimigo i
 class EvolutionSystem{
     public:
         int tamanho_populacao = 20;
-        float taxa_mutacao = 20;
+        int taxa_mutacao = 50; // colocar como %, Ex: 50 = 50%
         float percentual_elite = 0.50f;
+        vector<float> melhor_fitness;
 
         vector<Personagem> populacao;
         Inimigo inimigo;
@@ -253,6 +254,7 @@ class EvolutionSystem{
                 [](const Personagem& a, const Personagem& b){
                     return a.fitness > b.fitness;
                 });
+            melhor_fitness.clear();
         }
 
         // Cria o inimigo inicial
@@ -342,6 +344,25 @@ class EvolutionSystem{
                 personagem.velocidade * 0.15f;
         }
 
+        // mini torneio entre personagens aleatorios para ser pai
+        Personagem Torneio(){
+            Personagem MelhorDoTorneio;
+    
+            Personagem personagem1 = gerarPersonagem();
+            Personagem personagem2 = gerarPersonagem();
+            Personagem personagem3 = gerarPersonagem();
+
+            if(personagem1.fitness > personagem2.fitness && personagem1.fitness > personagem3.fitness){
+                MelhorDoTorneio = personagem1;
+            } else if(personagem2.fitness > personagem3.fitness){
+                MelhorDoTorneio = personagem2;
+            } else{
+                MelhorDoTorneio = personagem3;
+            }
+
+            return MelhorDoTorneio;
+        }
+
         // Gera uma nova geração com base na anterior
         void gerarNovaGeracao(bool predacao){
             auto elite = selecionarMelhores();
@@ -351,7 +372,7 @@ class EvolutionSystem{
             for (auto& e : elite) novaPop.push_back(e);
 
             //reseta o fitness da elite
-            for (int i = 0; i < novaPop.size(); i++){
+            for (int i = 0; (unsigned)i < novaPop.size(); i++){
                 novaPop[i].fitness = novaPop[i].vida * 0.35f +
                     novaPop[i].dano_fisico * 0.2f +
                     novaPop[i].dano_magico * 0.15f +
@@ -359,6 +380,8 @@ class EvolutionSystem{
                     novaPop[i].resistencia_magica * 0.05f +
                     novaPop[i].velocidade * 0.15f;
             }
+
+            melhor_fitness.push_back(novaPop[0].fitness);
 
             //predacao de elites
             if(predacao){
@@ -376,7 +399,12 @@ class EvolutionSystem{
                 if(i > 0){
                     novaPop.push_back(gerarPersonagem());
                 }else{
-                    Personagem& pai = elite[rand() % elite.size()];
+                    Personagem pai;
+                    if(random_number(1,10) < 7)
+                        pai = elite[rand() % elite.size()];
+                    else
+                        pai = Torneio();
+                    // Personagem& pai = elite[rand() % elite.size()];
                     Personagem& mae = elite[rand() % elite.size()];
 
                     Personagem filho = cruzar(pai, mae);
@@ -403,6 +431,7 @@ int main() {
         cout << "4 - Gerar novo inimigo\n";
         cout << "5 - Rodar evolucao(batalha e gera uma nova geracao)\n";
         cout << "6 - Predacao Habilitada na evolucao?(0 - nao, 1 - sim): " << predacao <<"\n";
+        cout << "7 - Mostrar melhor fitness de cada geracao\n";
         cout << "0 - Sair\n";
         cout << "Escolha: ";
         cin >> opcao;
@@ -456,6 +485,15 @@ int main() {
             geracao++;
         } else if(opcao == 6){
             predacao = !predacao;
+        } else if(opcao == 7){
+            if(geracao == 0){
+                cout << "Nao houve batalhas para definir o melhor de cada geracao\n";
+            } else{
+                for(int i = 0; (unsigned)i < evo.melhor_fitness.size(); i++){
+                    cout << "Melhor fitness geracao " << i <<":" << evo.melhor_fitness[i] << "\n";
+                }
+            }
+            
         } else if(opcao == 0){
             cout << "Encerrando o programa\n";
             break;
