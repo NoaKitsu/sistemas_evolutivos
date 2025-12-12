@@ -2,7 +2,7 @@
 ### SSC0713 - Sistemas Evolutivos Aplicados à Robótica
 ---
 * **Docente:** Eduardo do Valle Simões
-* **Aluno:** Lucas Issao Omati - 13673090
+* **Aluno:** Lucas Issao Omati - EVO-17
 ---
 ##  Introdução
 Projeto desenvolvido para a matéria Sistemas Evolutivos Aplicados à Robótica que utiliza algoritmos genéticos para encontrar o melhor personagem de um jogo para enfrentar dado inimigo aleatório.
@@ -30,4 +30,4 @@ Código feito em c++
 
 Para executar o projeto basta executar o executável.
 
-Link vídeo: 
+Link vídeo: https://drive.google.com/file/d/1WtgOFNvh1OMfglWbf4t6jaIyMTZnH1CN/view?usp=sharing
